@@ -1,10 +1,60 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
+import Store from "./store/store.ts";
+import InvestorDashboard from "./pages/Dashboard/InvestorDashboard.tsx";
+import EntrepreneurDashboard from "./pages/Dashboard/EntrepreneurDashboard.tsx";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
+import App from "./App.tsx";
 
-createRoot(document.getElementById('root')!).render(
+import "./index.css";
+import Home from "./pages/Home/Home.tsx";
+import Login from "./pages/login/Login.tsx";
+import Register from "./pages/register/Register.tsx";
+import About from "./pages/about/About.tsx";
+import Entrepreneur from "./pages/EntrepreneurList/Entrepreneur.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/" element={<App />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route
+          path="/dashboard/entrepreneur"
+          element={
+            <ProtectedRoute allowedRoles={["entrepreneur"]}>
+              <EntrepreneurDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/investor"
+          element={
+            <ProtectedRoute allowedRoles={["investor"]}>
+              <InvestorDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/entrepreneurs" element={<Entrepreneur />} />
+      </Route>
+    </>,
+  ),
+);
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <Provider store={Store}>
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>,
-)
+);
