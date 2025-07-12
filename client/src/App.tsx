@@ -16,7 +16,7 @@ const App = () => {
   return (
     <>
       <Header />
-      <main className=" bg-gray-50">
+      <main className=" ">
         <Outlet />
       </main>
       <Footer />

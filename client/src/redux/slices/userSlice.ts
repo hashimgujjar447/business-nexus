@@ -7,6 +7,7 @@ interface User {
   name: string;
   email: string;
   role: "investor" | "entrepreneur";
+  _id: string;
 }
 
 export const fetchCurrentUser = createAsyncThunk<
@@ -32,6 +33,7 @@ interface UserState {
   isAuthenticated: boolean;
   error: string | null;
   hasFetched: boolean; // NEW
+  _id: string; // Add _id to the state
 }
 
 const initialState: UserState = {
@@ -42,6 +44,7 @@ const initialState: UserState = {
   isAuthenticated: false,
   error: null,
   hasFetched: false, // NEW
+  _id: "", // Add _id to the state
 };
 
 const userSlice = createSlice({
@@ -55,6 +58,8 @@ const userSlice = createSlice({
       state.role = role;
       state.isAuthenticated = true;
       state.hasFetched = true;
+      state._id = action.payload._id; // Set _id from payload
+      state.error = null;
     },
     logout: (state) => {
       state.name = "";
@@ -62,6 +67,8 @@ const userSlice = createSlice({
       state.role = "";
       state.isAuthenticated = false;
       state.hasFetched = true;
+      state._id = ""; // Reset _id on logout
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -78,12 +85,14 @@ const userSlice = createSlice({
         state.isAuthenticated = true;
         state.loading = false;
         state.hasFetched = true;
+        state._id = action.payload._id; // Set _id from payload
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         state.isAuthenticated = false;
         state.hasFetched = true;
+        state._id = ""; // Reset _id on error
       });
   },
 });

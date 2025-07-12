@@ -1,0 +1,27 @@
+// src/components/InvestorDashboard/EntrepreneurCard.tsx
+import { useNavigate } from "react-router-dom";
+
+const EntrepreneurCard = ({ profile }: { profile: any }) => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="bg-white rounded shadow p-4 space-y-2 hover:shadow-md transition">
+      <img
+        src={profile.avatar || "/default-avatar.png"}
+        alt="avatar"
+        className="w-16 h-16 rounded-full object-cover"
+      />
+      <h3 className="text-lg font-semibold">{profile.user.name}</h3>
+      <p className="text-sm text-gray-500">{profile.location}</p>
+      <p className="text-sm text-gray-700">{profile.bio?.slice(0, 100)}...</p>
+      <button
+        onClick={() => navigate(`/profile/entrepreneur/${profile.user._id}`)}
+        className="bg-indigo-600 text-white px-4 py-1 rounded mt-2"
+      >
+        View Profile
+      </button>
+    </div>
+  );
+};
+
+export default EntrepreneurCard;

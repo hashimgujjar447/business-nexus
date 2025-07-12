@@ -19,6 +19,10 @@ import Register from "./pages/register/Register.tsx";
 import About from "./pages/about/About.tsx";
 import Entrepreneur from "./pages/EntrepreneurList/Entrepreneur.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import EditInvestorProfile from "./components/InvestorDashboard/EditInvestorProfile.tsx";
+import EditEntrepreneurProfile from "./components/EntrepreneurDashboard/EditEnterpreneurProfile.tsx";
+import PublicEntrepreneurProfile from "./components/EntrepreneurDashboard/PublicEntrepreneurProfile.tsx";
+import PublicInvestorProfile from "./components/InvestorDashboard/PublicInvestorProfile.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,12 +41,36 @@ const router = createBrowserRouter(
           }
         />
         <Route
+          path="/dashboard/investor/edit-profile"
+          element={
+            <ProtectedRoute allowedRoles={["investor"]}>
+              <EditInvestorProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/entrepreneur/edit-profile"
+          element={
+            <ProtectedRoute allowedRoles={["entrepreneur"]}>
+              <EditEntrepreneurProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard/investor"
           element={
             <ProtectedRoute allowedRoles={["investor"]}>
               <InvestorDashboard />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/profile/investor/:id"
+          element={<PublicInvestorProfile />}
+        />
+        <Route
+          path="/profile/entrepreneur/:id"
+          element={<PublicEntrepreneurProfile />}
         />
 
         <Route path="/entrepreneurs" element={<Entrepreneur />} />
