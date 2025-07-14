@@ -1,16 +1,27 @@
 import dotenv from "dotenv";
 import app from "./app";
-dotenv.config();
+import http from "http";
+import { initSocket } from "./socket";
 import { connectDB } from "./config/db/connect";
 
+dotenv.config();
+
 const PORT = process.env.PORT || 8080;
+const server = http.createServer(app);
+initSocket(server); // initialize socket
 
 const startServer = async () => {
-  await connectDB();
+  try {
+    await connectDB();
+    console.log("✅ MongoDB connected");
 
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
-  });
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running at http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  }
 };
 
 startServer();

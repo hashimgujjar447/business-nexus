@@ -13,7 +13,12 @@ const EntrepreneurCard = ({ profile }: { profile: any }) => {
       />
       <h3 className="text-lg font-semibold">{profile.user.name}</h3>
       <p className="text-sm text-gray-500">{profile.location}</p>
-      <p className="text-sm text-gray-700">{profile.bio?.slice(0, 100)}...</p>
+      <p className="text-sm text-gray-700">
+        {profile.bio}.loarm s sd s ddsss dsd Lorem ipsum dolor sit amet
+        consectetur adipisicing elit. Eveniet facilis neque nisi deserunt,
+        accusamus perferendis facere praesentium fugit sed vel quidem saepe
+        quasi laboriosam illo aliquid qui minus sit voluptatem!{" "}
+      </p>
       <button
         onClick={() => navigate(`/profile/entrepreneur/${profile.user._id}`)}
         className="bg-indigo-600 text-white px-4 py-1 rounded mt-2"

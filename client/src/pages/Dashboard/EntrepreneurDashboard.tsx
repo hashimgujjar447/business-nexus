@@ -3,11 +3,13 @@ import type { RootState } from "../../store/store";
 import { useEffect, useState } from "react";
 import EntrepreneurProfileSection from "../../components/EntrepreneurProfileSection";
 import { axiosInstance } from "../../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const EntrepreneurDashboard = () => {
-  const { name, email } = useSelector((state: RootState) => state.user);
+  const { name, email, _id } = useSelector((state: RootState) => state.user);
   const [whichLinkActive, setWhichLinkActive] = useState("dashboard");
   const [receivedRequests, setReceivedRequests] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEntrepreneurs = async () => {
@@ -198,7 +200,12 @@ const EntrepreneurDashboard = () => {
                 )}
 
                 {request.status === "Accepted" && (
-                  <button className=" bg-green-600 text-white py-2 px-5 rounded hover:bg-green-700 flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      navigate(`/chat/${_id}`);
+                    }}
+                    className=" bg-green-600 text-white py-2 px-5 rounded hover:bg-green-700 flex items-center gap-2"
+                  >
                     <span>Chat</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

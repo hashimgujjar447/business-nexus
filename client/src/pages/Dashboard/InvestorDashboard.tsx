@@ -14,7 +14,7 @@ const InvestorDashboard = () => {
   useEffect(() => {
     const fetchEntrepreneurs = async () => {
       try {
-        const response = await axiosInstance("/explore/entrepreneurs");
+        const response = await axiosInstance.get("/explore/entrepreneurs");
         const Requests = await axiosInstance.get("/requests");
         console.log(Requests);
 
@@ -73,26 +73,42 @@ const InvestorDashboard = () => {
 
       {/* Main Content */}
       {whichLinkActive === "dashboard" ? (
-        <main className="flex-1 bg-gray-50 p-6">
-          {/* Topbar */}
-          <header className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-semibold text-gray-800">Welcome 👋</h1>
+        <main className="flex-1 bg-gray-50 p-8">
+          {/* Top Navigation */}
+          <header className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Investor Dashboard
+            </h1>
+            {/* Optional: Add user profile or settings icon here */}
           </header>
 
-          {/* User Info */}
-          <section className="bg-white p-6 rounded shadow">
-            <h2 className="text-xl font-bold text-indigo-600">Your Info</h2>
-            <p className="mt-2 text-gray-700">
-              <strong>Name:</strong> {name}
-            </p>
-            <p className="text-gray-700">
-              <strong>Email:</strong> {email}
-            </p>
+          {/* User Summary Card */}
+          <section className="bg-white p-6 rounded-2xl shadow-md">
+            <div className="mb-4">
+              <h2 className="text-2xl font-semibold text-indigo-700">
+                Your Profile
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Basic account information
+              </p>
+            </div>
+
+            <div className="space-y-2 text-gray-800">
+              <p>
+                <span className="font-medium">Name:</span> {name}
+              </p>
+              <p>
+                <span className="font-medium">Email:</span> {email}
+              </p>
+            </div>
 
             {/* CTA */}
             <div className="mt-6">
-              <button className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">
-                Explore Entrepreneur Ideas
+              <button
+                onClick={() => setWhichLinkActive("Browse Entrepreneurs")}
+                className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"
+              >
+                Explore Entrepreneurs
               </button>
             </div>
           </section>
@@ -106,7 +122,7 @@ const InvestorDashboard = () => {
           <h2 className="text-xl font-bold text-indigo-600">
             Browse Entrepreneurs
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2  gap-4 mt-4">
             {/* Map through entrepreneurs and render a card for each */}
             {entrepreneurs.map((profile: any) => (
               <EntrepreneurCard key={profile._id} profile={profile} />
@@ -127,7 +143,7 @@ const InvestorDashboard = () => {
                 >
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-800">
-                      {request.entrepreneur.name}
+                      <p>{request.entrepreneur?.name || "Unknown User"}</p>
                     </h3>
                     <p className="text-sm text-gray-600">
                       {request.entrepreneur.bio || "No bio provided"}

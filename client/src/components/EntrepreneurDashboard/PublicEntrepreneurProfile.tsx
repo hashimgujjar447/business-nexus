@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
 
 const PublicEntrepreneurProfile = () => {
   const { id } = useParams();
@@ -9,8 +11,10 @@ const PublicEntrepreneurProfile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [requestStatus, setRequestStatus] = useState<
-    "idle" | "sent" | "accepted" | "error"
+    "idle" | "sent" | "accepted" | "error" | "reject"
   >("idle");
+
+  const { _id } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -32,6 +36,8 @@ const PublicEntrepreneurProfile = () => {
         if (existingRequest) {
           if (existingRequest.status === "Accepted") {
             setRequestStatus("accepted");
+          } else if (existingRequest.status === "Rejected") {
+            setRequestStatus("reject");
           } else {
             setRequestStatus("sent");
           }
@@ -104,7 +110,7 @@ const PublicEntrepreneurProfile = () => {
 
         {requestStatus === "accepted" ? (
           <button
-            onClick={() => navigate(`/chat/${profile.user._id}`)}
+            onClick={() => navigate(`/chat/${_id}`)}
             className="mt-4 bg-green-600 text-white py-2 px-5 rounded hover:bg-green-700 flex items-center gap-2"
           >
             <span>Chat</span>
@@ -124,12 +130,16 @@ const PublicEntrepreneurProfile = () => {
           >
             Request Sent
           </button>
+        ) : requestStatus === "reject" ? (
+          <button className="mt-4 bg-red-500 text-white py-2 px-5 rounded">
+            Reject
+          </button>
         ) : (
           <button
-            onClick={handleRequest}
-            className="mt-4 bg-indigo-600 text-white py-2 px-5 rounded hover:bg-indigo-700 transition"
+            onClick={() => handleRequest()}
+            className="mt-4 bg-red-500 text-white py-2 px-5 rounded"
           >
-            Connect
+            Send Request
           </button>
         )}
       </div>

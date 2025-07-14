@@ -23,6 +23,7 @@ import EditInvestorProfile from "./components/InvestorDashboard/EditInvestorProf
 import EditEntrepreneurProfile from "./components/EntrepreneurDashboard/EditEnterpreneurProfile.tsx";
 import PublicEntrepreneurProfile from "./components/EntrepreneurDashboard/PublicEntrepreneurProfile.tsx";
 import PublicInvestorProfile from "./components/InvestorDashboard/PublicInvestorProfile.tsx";
+import ChatPage from "./pages/Chat/ChatPage.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -74,6 +75,7 @@ const router = createBrowserRouter(
         />
 
         <Route path="/entrepreneurs" element={<Entrepreneur />} />
+        <Route path="/chat/:id" element={<ChatPage />} />
       </Route>
     </>,
   ),
