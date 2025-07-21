@@ -1,0 +1,22 @@
+@import "tailwindcss";
+/* styles/globals.css */
+.dashboard-card {
+  @apply p-6 bg-white shadow-md rounded-xl border border-gray-100 hover:shadow-lg transition-all;
+}
+
+.input {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 outline-none;
+}
+
+.dashboard-card {
+  @apply sm:p-6 bg-white shadow-md rounded-xl border border-gray-100 hover:shadow-lg transition-all;
+}
+
+.remove_scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.remove_scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

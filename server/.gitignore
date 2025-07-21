@@ -1,0 +1,36 @@
+
+node_modules
+
+.env
+
+!dist
+=======
+# Ignore node_modules directory
+node_modules/
+
+# Ignore environment variable files
+.env
+.env.local
+.env.production
+
+
+# Ignore log files
+*.log
+
+# Ignore build output except dist
+/build/
+!dist/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore coverage and test output
+coverage/
+*.test.js
+*.spec.js
+
+# Ignore IDE/editor folders
+.vscode/
+.idea/
+*.swp
