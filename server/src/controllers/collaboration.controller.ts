@@ -20,7 +20,7 @@ export const sendRequest = async (req: Request, res: Response) => {
       });
     }
 
-    if (!message || message === "") {
+    if (typeof message !== "string" || !message.trim()) {
       return res.status(400).json({
         success: false,
         message: "Proposal message is required",
@@ -68,7 +68,7 @@ export const sendRequest = async (req: Request, res: Response) => {
       status: "pending",
     });
 
-    await NotificationModel.create({
+    const notification = await NotificationModel.create({
       userId: receiverId,
 
       title: "New Collaboration Request",
@@ -86,6 +86,7 @@ export const sendRequest = async (req: Request, res: Response) => {
       success: true,
       message: "Collaboration request sent successfully",
       data: request,
+      notification: notification,
     });
   } catch (error) {
     console.error("Send Request Error:", error);
@@ -142,7 +143,7 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
 
     await request.save();
 
-    await NotificationModel.create({
+    const notification = await NotificationModel.create({
       userId: request.senderId,
 
       title: status === "accepted" ? "Request Accepted" : "Request Rejected",
@@ -163,6 +164,7 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
       success: true,
       message: `Request ${status} successfully`,
       data: request,
+      notification,
     });
   } catch (error) {
     console.error("Update Request Status Error:", error);

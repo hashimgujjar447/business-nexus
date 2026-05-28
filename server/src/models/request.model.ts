@@ -6,7 +6,7 @@ export interface IRequest extends Document {
   senderId: mongoose.Types.ObjectId;
   receiverId: mongoose.Types.ObjectId;
 
-  message: string;
+  message?: string;
 
   status: RequestStatus;
 
@@ -29,7 +29,6 @@ const requestSchema = new Schema<IRequest>(
 
     message: {
       type: String,
-      required: true,
       trim: true,
       maxLength: 500,
     },
