@@ -2,15 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 interface JwtPayload {
-  id: any;
   _id: string;
-  role: string;
   email: string;
-  name: string;
-  // Add other fields if needed
+  role: string;
 }
 
-// Extend Express Request interface to include 'user'
 declare global {
   namespace Express {
     interface Request {
@@ -25,20 +21,29 @@ export const isAuthenticated = (
   next: NextFunction,
 ) => {
   try {
-    const token =
-      req.cookies?.token || req.headers.authorization?.replace("Bearer ", "");
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: No token provided" });
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "No access token provided",
+      });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    const accessToken = authHeader.split(" ")[1];
 
-    req.user = decoded; // You may need to extend Express Request type
+    const decoded = jwt.verify(
+      accessToken,
+      process.env.JWT_ACCESS_SECRET!,
+    ) as JwtPayload;
+
+    req.user = decoded;
+
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired access token",
+    });
   }
 };

@@ -5,6 +5,7 @@ import {
   getAllEntrepreneurs,
   updateEntrepreneurProfile,
   updateInvestorProfile,
+  getEntrepreneurDetail,
 } from "../controllers/profile.controller";
 
 const router = express.Router();
@@ -27,5 +28,10 @@ router.post(
 
 // get all entrepreneurs
 router.get("/entrepreneurs", isAuthenticated, getAllEntrepreneurs);
+router.get(
+  "/entrepreneurs/:entrepreneur_id",
+  isAuthenticated,
+  getEntrepreneurDetail,
+);
 
 export default router;

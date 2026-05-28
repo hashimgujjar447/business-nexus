@@ -1,169 +1,277 @@
 import { Request, Response } from "express";
-import RequestModel from "../models/request.model";
 
-// 1. Send Collaboration Request
+import RequestModel from "../models/request.model";
+import NotificationModel from "../models/notification.model";
+
 export const sendRequest = async (req: Request, res: Response) => {
   try {
     const senderId = req.user?._id;
+    const senderRole = req.user?.role;
+    const senderEmail = req.user?.email;
+
     const receiverId = req.params.id;
+
+    const { message } = req.body;
 
     if (!senderId || !receiverId) {
       return res.status(400).json({
-        message: "Both sender and receiver IDs are required",
         success: false,
+        message: "Sender and receiver IDs are required",
       });
     }
 
-    // Prevent duplicate requests in either direction
+    if (!message || message === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Proposal message is required",
+      });
+    }
+
+    if (senderRole !== "investor") {
+      return res.status(403).json({
+        success: false,
+        message: "Only investors can send collaboration requests",
+      });
+    }
+
+    if (senderId.toString() === receiverId) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot send request to yourself",
+      });
+    }
+
     const existingRequest = await RequestModel.findOne({
       $or: [
-        { senderId, receiverId },
-        { senderId: receiverId, receiverId: senderId },
+        {
+          senderId,
+          receiverId,
+        },
+        {
+          senderId: receiverId,
+          receiverId: senderId,
+        },
       ],
     });
 
     if (existingRequest) {
       return res.status(409).json({
-        message: "Request already exists or you are already connected",
         success: false,
+        message: "Request already exists or users are already connected",
       });
     }
 
     const request = await RequestModel.create({
       senderId,
       receiverId,
+      message,
       status: "pending",
     });
 
+    await NotificationModel.create({
+      userId: receiverId,
+
+      title: "New Collaboration Request",
+
+      message: `${senderEmail} sent you a collaboration proposal.`,
+
+      type: "request",
+
+      relatedUserId: senderId,
+
+      relatedRequestId: request._id,
+    });
+
     return res.status(201).json({
-      message: "Request sent successfully",
       success: true,
-      request,
+      message: "Collaboration request sent successfully",
+      data: request,
     });
   } catch (error) {
     console.error("Send Request Error:", error);
+
     return res.status(500).json({
-      message: "Internal server error while sending request",
       success: false,
+      message: "Internal server error while sending collaboration request",
     });
   }
 };
 
-// 2. Update Request Status (accept/reject)
 export const updateRequestStatus = async (req: Request, res: Response) => {
   try {
     const requestId = req.params.id;
+
+    const currentUserId = req.user?._id;
+
+    const currentUserEmail = req.user?.email;
+
     const { status } = req.body;
 
     if (!["accepted", "rejected"].includes(status)) {
       return res.status(400).json({
-        message: "Status must be either 'accepted' or 'rejected'",
         success: false,
+        message: "Status must be either accepted or rejected",
       });
     }
 
-    const updatedRequest = await RequestModel.findByIdAndUpdate(
-      requestId,
-      { status },
-      { new: true },
-    );
+    const request = await RequestModel.findById(requestId);
 
-    if (!updatedRequest) {
+    if (!request) {
       return res.status(404).json({
-        message: "Request not found",
         success: false,
+        message: "Request not found",
       });
     }
+
+    if (request.receiverId.toString() !== currentUserId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to update this request",
+      });
+    }
+
+    if (request.status !== "pending") {
+      return res.status(400).json({
+        success: false,
+        message: "Request already processed",
+      });
+    }
+
+    request.status = status;
+    request.isRead = true;
+
+    await request.save();
+
+    await NotificationModel.create({
+      userId: request.senderId,
+
+      title: status === "accepted" ? "Request Accepted" : "Request Rejected",
+
+      message:
+        status === "accepted"
+          ? `${currentUserEmail} accepted your collaboration request.`
+          : `${currentUserEmail} rejected your collaboration request.`,
+
+      type: status === "accepted" ? "request_accepted" : "request_rejected",
+
+      relatedUserId: request.receiverId,
+
+      relatedRequestId: request._id,
+    });
 
     return res.status(200).json({
-      message: `Request ${status} successfully`,
       success: true,
-      request: updatedRequest,
+      message: `Request ${status} successfully`,
+      data: request,
     });
   } catch (error) {
     console.error("Update Request Status Error:", error);
+
     return res.status(500).json({
-      message: "Internal server error while updating request",
       success: false,
+      message: "Internal server error while updating request",
     });
   }
 };
 
-// 3. Get All Sent Requests
 export const fetchAllMyRequests = async (req: Request, res: Response) => {
   try {
     const senderId = req.user?._id;
 
     if (!senderId) {
       return res.status(401).json({
-        message: "User ID is required",
         success: false,
+        message: "Unauthorized",
       });
     }
 
-    const requests = await RequestModel.find({ senderId }).populate(
-      "receiverId",
-      "name email avatar",
-    );
+    const requests = await RequestModel.find({
+      senderId,
+    })
+      .populate("receiverId", "name email avatar role location")
+      .sort({
+        createdAt: -1,
+      });
 
     return res.status(200).json({
       success: true,
-      requests,
+      data: requests,
     });
   } catch (error) {
     console.error("Fetch Sent Requests Error:", error);
+
     return res.status(500).json({
-      message: "Error while fetching your sent requests",
       success: false,
+      message: "Internal server error while fetching sent requests",
     });
   }
 };
 
-// 4. Get All Received Requests
 export const fetchReceiveRequests = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;
 
     if (!userId) {
       return res.status(401).json({
-        message: "User ID is required",
         success: false,
+        message: "Unauthorized",
       });
     }
 
-    const requests = await RequestModel.find({ receiverId: userId }).populate(
-      "senderId",
-      "name email avatar",
-    );
+    const requests = await RequestModel.find({
+      receiverId: userId,
+    })
+      .populate("senderId", "name email avatar role location")
+      .sort({
+        createdAt: -1,
+      });
 
     return res.status(200).json({
       success: true,
-      requests,
+      data: requests,
     });
   } catch (error) {
     console.error("Fetch Received Requests Error:", error);
+
     return res.status(500).json({
-      message: "Error while fetching your received requests",
       success: false,
+      message: "Internal server error while fetching received requests",
     });
   }
 };
 
 export const fetchAllAcceptedRequests = async (req: Request, res: Response) => {
   try {
-    const requests = await RequestModel.find({ status: "accepted" })
-      .populate("senderId", "name email avatar")
-      .populate("receiverId", "name email avatar");
+    const userId = req.user?._id;
+
+    const requests = await RequestModel.find({
+      status: "accepted",
+
+      $or: [
+        {
+          senderId: userId,
+        },
+        {
+          receiverId: userId,
+        },
+      ],
+    })
+      .populate("senderId", "name email avatar role location")
+      .populate("receiverId", "name email avatar role location")
+      .sort({
+        updatedAt: -1,
+      });
 
     return res.status(200).json({
       success: true,
-      requests,
+      data: requests,
     });
   } catch (error) {
-    console.error("Fetch All Available Requests Error:", error);
+    console.error("Fetch Accepted Requests Error:", error);
+
     return res.status(500).json({
-      message: "Error while fetching all available requests",
       success: false,
+      message: "Internal server error while fetching accepted requests",
     });
   }
 };

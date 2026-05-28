@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 
 export type UserRole = "investor" | "entrepreneur";
 
@@ -9,6 +9,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: UserRole;
+
   avatar?: string;
   bio?: string;
   location?: string;
@@ -16,9 +17,9 @@ export interface IUser extends Document {
   experience?: string;
   portfolioCompanies?: string[];
   startupIdea?: string;
+
   isProfileComplete: boolean;
 
-  generateToken(): string;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -29,50 +30,61 @@ const UserSchema: Schema<IUser> = new Schema(
       required: true,
       trim: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
     },
+
     password: {
       type: String,
       required: true,
       minlength: 6,
     },
+
     role: {
       type: String,
       enum: ["investor", "entrepreneur"],
       required: true,
     },
+
     avatar: {
       type: String,
       default: "",
     },
+
     bio: {
       type: String,
       default: "",
     },
+
     location: {
       type: String,
       default: "",
     },
+
     skills: {
       type: [String],
       default: [],
     },
+
     experience: {
       type: String,
       default: "",
     },
+
     portfolioCompanies: {
       type: [String],
       default: [],
     },
+
     startupIdea: {
       type: String,
       default: "",
     },
+
     isProfileComplete: {
       type: Boolean,
       default: false,
@@ -83,28 +95,30 @@ const UserSchema: Schema<IUser> = new Schema(
   },
 );
 
-// Hash password before saving
+// ========================================
+// Hash Password
+// ========================================
+
 UserSchema.pre<IUser>("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) {
+    return next();
+  }
+
   const salt = await bcrypt.genSalt(10);
+
   this.password = await bcrypt.hash(this.password, salt);
+
   next();
 });
 
-// Compare password method
+// ========================================
+// Compare Password
+// ========================================
+
 UserSchema.methods.comparePassword = function (
   password: string,
 ): Promise<boolean> {
   return bcrypt.compare(password, this.password);
-};
-
-// Generate JWT token method
-UserSchema.methods.generateToken = function (): string {
-  return jwt.sign(
-    { _id: this._id, email: this.email, role: this.role },
-    process.env.JWT_SECRET!,
-    { expiresIn: "7d" },
-  );
 };
 
 export const User = mongoose.model<IUser>("User", UserSchema);
