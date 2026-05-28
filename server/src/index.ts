@@ -4,12 +4,12 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.HOSTED_CLIENT_URL,
+    origin: process.env.CLIENT_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
