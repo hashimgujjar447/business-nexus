@@ -20,9 +20,6 @@ export interface IUser extends Document {
 
   isProfileComplete: boolean;
 
-  generateAccessToken(): string;
-  generateRefreshToken(): string;
-
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -122,34 +119,6 @@ UserSchema.methods.comparePassword = function (
   password: string,
 ): Promise<boolean> {
   return bcrypt.compare(password, this.password);
-};
-
-UserSchema.methods.generateAccessToken = function (): string {
-  return jwt.sign(
-    {
-      _id: this._id,
-      email: this.email,
-      role: this.role,
-    },
-    process.env.JWT_ACCESS_SECRET as Secret,
-    {
-      expiresIn: "15m",
-    },
-  );
-};
-
-UserSchema.methods.generateRefreshToken = function (): string {
-  return jwt.sign(
-    {
-      _id: this._id,
-      email: this.email,
-      role: this.role,
-    },
-    process.env.JWT_REFRESH_SECRET as Secret,
-    {
-      expiresIn: "7d",
-    },
-  );
 };
 
 export const User = mongoose.model<IUser>("User", UserSchema);

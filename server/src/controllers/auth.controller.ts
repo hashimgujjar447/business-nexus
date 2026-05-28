@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model";
+import { generateAccessToken, generateRefreshToken } from "../utils/token";
 
 const sendRefreshTokenCookie = (res: Response, refreshToken: string) => {
   res.cookie("refresh", refreshToken, {
@@ -91,8 +92,14 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+    const payload = {
+      _id: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    };
+
+    const refreshToken = generateRefreshToken(payload);
+    const accessToken = generateAccessToken(payload);
 
     sendRefreshTokenCookie(res, refreshToken);
 
@@ -199,7 +206,12 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
       });
     }
 
-    const newAccessToken = user.generateAccessToken();
+    const payload = {
+      _id: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    };
+    const newAccessToken = generateAccessToken(payload);
 
     return res.status(200).json({
       success: true,
