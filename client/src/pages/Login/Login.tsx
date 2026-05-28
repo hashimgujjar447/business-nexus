@@ -2,7 +2,7 @@
 // Login.tsx
 // ========================================
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../../api/auth.api";
 
 import { setCredentials } from "../../features/auth/authSlice";
+import socket from "../../utils/socket";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -40,6 +41,9 @@ const Login = () => {
           user,
         }),
       );
+
+      console.log(user);
+      socket.emit("register_user", user.id);
 
       navigate(`/dashboard/${user.role}`);
     } catch (err) {

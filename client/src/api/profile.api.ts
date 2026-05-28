@@ -12,3 +12,7 @@ export const updateInvestorProfile = (data: FormData) => {
 export const getAllEntrepreneurs = () => {
   return axiosInstance.get("/profile/entrepreneurs");
 };
+
+export const getEntrepreneurDetail = (entrepreneur_id: string) => {
+  return axiosInstance.get(`/profile/entrepreneurs/${entrepreneur_id}`);
+};

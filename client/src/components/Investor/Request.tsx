@@ -33,6 +33,7 @@ const Requests = () => {
     const fetchRequests = async () => {
       try {
         const response = await getSentRequests();
+
         setRequests(response.data.data || []);
       } catch (err) {
         setError("Failed to fetch collaboration requests");

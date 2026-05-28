@@ -10,10 +10,6 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// ========================================
-// Request Interceptor
-// ========================================
-
 axiosInstance.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
@@ -44,7 +40,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          "http://localhost:8080/api/v1/auth/refreshAccess",
+          "http://localhost:8080/api/v1/auth/refresh",
           {},
           {
             withCredentials: true,

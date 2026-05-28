@@ -62,12 +62,12 @@ const Header = () => {
               >
                 Dashboard
               </Link>
-              <Link
+              {/* <Link
                 to={`/profile/${user?.role}/${user?._id}`}
                 className="hover:text-blue-600"
               >
                 Profile
-              </Link>
+              </Link> */}
               <button
                 onClick={handleLogout}
                 className="text-white p-1 px-3 rounded-lg bg-red-600 hover:bg-red-700 transition text-sm"

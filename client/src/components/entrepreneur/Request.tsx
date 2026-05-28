@@ -1,27 +1,39 @@
 import { useEffect, useState } from "react";
+
 import {
   getReceivedRequests,
   updateRequestStatus,
 } from "../../api/request.api";
 
+import socket from "../../utils/socket";
+
 type RequestStatus = "pending" | "accepted" | "rejected";
 
 interface Request {
   _id: string;
+
   investorName: string;
+
   avatar: string;
+
   message: string;
+
   status: RequestStatus;
+
   senderId: {
     name: string;
+
     _id: string;
+
     avatar?: string;
   };
 }
 
 const CollabRequests = () => {
   const [requests, setRequests] = useState<Request[]>([]);
+
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -44,14 +56,50 @@ const CollabRequests = () => {
     id: string,
     newStatus: "accepted" | "rejected",
   ) => {
-    await updateRequestStatus(id, newStatus);
-    setRequests((prev) =>
-      prev.map((req) => (req._id === id ? { ...req, status: newStatus } : req)),
-    );
+    try {
+      const request = await updateRequestStatus(id, newStatus);
+      const notification = request.data.notification;
+
+      const currentRequest = requests.find((req) => req._id === id);
+
+      setRequests((prev) =>
+        prev.map((req) =>
+          req._id === id
+            ? {
+                ...req,
+                status: newStatus,
+              }
+            : req,
+        ),
+      );
+
+      if (currentRequest) {
+        socket.emit("send_request_status_notification", {
+          _id: notification._id,
+          receiverId: currentRequest.senderId._id,
+
+          requestId: currentRequest._id,
+
+          status: newStatus,
+
+          title:
+            newStatus === "accepted" ? "Request Accepted" : "Request Rejected",
+
+          message: notification.message,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update request status", error);
+    }
   };
 
-  if (loading) return <p className="text-gray-600">Loading requests...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (loading) {
+    return <p className="text-gray-600">Loading requests...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
 
   return (
     <div className="space-y-6">
@@ -68,7 +116,23 @@ const CollabRequests = () => {
           {requests.map((req) => (
             <div
               key={req._id}
-              className="bg-white border rounded-2xl p-4 sm:p-6 shadow hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="
+                bg-white
+                border
+                rounded-2xl
+                p-4
+                sm:p-6
+                shadow
+                hover:shadow-md
+                transition-all
+                duration-300
+                flex
+                flex-col
+                sm:flex-row
+                sm:items-center
+                justify-between
+                gap-4
+              "
             >
               <div className="flex items-center gap-4">
                 <img
@@ -77,11 +141,27 @@ const CollabRequests = () => {
                     `https://ui-avatars.com/api/?name=${req.senderId.name}`
                   }
                   alt={req.senderId.name}
-                  className="w-14 h-14 rounded-full object-cover border"
+                  className="
+                    w-14
+                    h-14
+                    rounded-full
+                    object-cover
+                    border
+                  "
                 />
+
                 <div>
                   <h4 className="font-semibold text-lg">{req.senderId.name}</h4>
-                  <p className="text-sm text-gray-500 line-clamp-1 max-w-[220px] sm:max-w-xs">
+
+                  <p
+                    className="
+                      text-sm
+                      text-gray-500
+                      line-clamp-1
+                      max-w-[220px]
+                      sm:max-w-xs
+                    "
+                  >
                     {req.message}
                   </p>
                 </div>
@@ -92,24 +172,50 @@ const CollabRequests = () => {
                   <>
                     <button
                       onClick={() => updateStatus(req._id, "accepted")}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-1.5 rounded-xl transition"
+                      className="
+                        bg-emerald-600
+                        hover:bg-emerald-700
+                        text-white
+                        text-sm
+                        px-4
+                        py-1.5
+                        rounded-xl
+                        transition
+                      "
                     >
                       Accept
                     </button>
+
                     <button
                       onClick={() => updateStatus(req._id, "rejected")}
-                      className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-1.5 rounded-xl transition"
+                      className="
+                        bg-red-500
+                        hover:bg-red-600
+                        text-white
+                        text-sm
+                        px-4
+                        py-1.5
+                        rounded-xl
+                        transition
+                      "
                     >
                       Reject
                     </button>
                   </>
                 ) : (
                   <span
-                    className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
-                      req.status === "accepted"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-red-100 text-red-600"
-                    }`}
+                    className={`
+                      text-xs
+                      font-semibold
+                      px-3
+                      py-1.5
+                      rounded-full
+                      ${
+                        req.status === "accepted"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-red-100 text-red-600"
+                      }
+                    `}
                   >
                     {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
                   </span>
