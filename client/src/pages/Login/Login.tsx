@@ -1,6 +1,16 @@
+// ========================================
+// Login.tsx
+// ========================================
+
 import { useState } from "react";
-import { login } from "../../api/auth.api";
+
 import { useNavigate } from "react-router-dom";
+
+import { useDispatch } from "react-redux";
+
+import { login } from "../../api/auth.api";
+
+import { setCredentials } from "../../features/auth/authSlice";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,15 +20,28 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+
   const handleLogin = async () => {
     if (!formData.email || !formData.password) {
       console.log("Email and password are required");
+
       return;
     }
 
     try {
       const res = await login(formData);
-      navigate(`/dashboard/${res.data.user.role}`);
+
+      const { accessToken, user } = res.data.data;
+
+      dispatch(
+        setCredentials({
+          accessToken,
+          user,
+        }),
+      );
+
+      navigate(`/dashboard/${user.role}`);
     } catch (err) {
       console.error("Login failed", err);
     }
@@ -35,6 +58,7 @@ const Login = () => {
           className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
+
             handleLogin();
           }}
         >
@@ -42,13 +66,17 @@ const Login = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
+
             <input
               type="email"
               className="w-full px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="you@example.com"
               value={formData.email}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, email: e.target.value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  email: e.target.value,
+                }))
               }
               required
             />
@@ -58,13 +86,17 @@ const Login = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
+
             <input
               type="password"
               className="w-full px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="••••••••"
               value={formData.password}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, password: e.target.value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  password: e.target.value,
+                }))
               }
               required
             />

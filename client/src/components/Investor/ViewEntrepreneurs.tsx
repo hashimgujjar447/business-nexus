@@ -31,7 +31,7 @@ const ViewEntrepreneurs = () => {
           getSentRequests(),
         ]);
 
-        setEntrepreneurs(entrepreneurRes.data.entrepreneurs || []);
+        setEntrepreneurs(entrepreneurRes.data.data || []);
         setRequests(requestRes.data.requests || []);
       } catch (error) {
         console.error("Failed to fetch data", error);

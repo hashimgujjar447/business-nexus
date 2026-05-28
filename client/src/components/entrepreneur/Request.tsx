@@ -28,7 +28,8 @@ const CollabRequests = () => {
     const fetchRequests = async () => {
       try {
         const data = await getReceivedRequests();
-        setRequests(data.data.requests);
+
+        setRequests(data.data.data);
       } catch (err) {
         setError("Failed to load requests.");
       } finally {

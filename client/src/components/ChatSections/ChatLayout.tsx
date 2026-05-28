@@ -32,7 +32,7 @@ const ChatLayout = () => {
     const fetchAcceptedUsers = async () => {
       try {
         const res = await getAcceptedRequests();
-        const requests = res.data.requests;
+        const requests = res.data.data;
 
         const userMap = new Map<string, IUser>();
 

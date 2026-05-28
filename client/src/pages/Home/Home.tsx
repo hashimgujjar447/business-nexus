@@ -1,3 +1,4 @@
+"use client";
 import { Rocket, Users, MessageSquareText, ShieldCheck } from "lucide-react";
 import QNA from "../../components/HomeSections/QNA";
 

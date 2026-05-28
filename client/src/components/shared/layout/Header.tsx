@@ -13,6 +13,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    localStorage.clear();
     await logoutUser();
     dispatch(logout());
     navigate("/");

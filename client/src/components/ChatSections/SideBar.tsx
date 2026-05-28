@@ -19,7 +19,7 @@ const SideBar: React.FC<SideBarProps> = ({
     const fetchUsers = async () => {
       try {
         const res = await getAcceptedRequests();
-        const requests = res.data.requests;
+        const requests = res.data.data;
 
         console.log(res, requests);
 
