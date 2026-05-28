@@ -129,9 +129,52 @@ export const getOthersProfile = async (req: Request, res: Response) => {
 
 export const getAllEntrepreneurs = async (req: Request, res: Response) => {
   try {
-    const entrepreneurs = await User.find({ role: "entrepreneur" });
+    const role = req.user?.role;
+    if (role !== "investor") {
+      return res
+        .status(401)
+        .json({ message: "You are not authorized to do it" });
+    }
+    const entrepreneurs = await User.find({ role: "entrepreneur" }).select(
+      "-password",
+    );
     res.status(200).json({ entrepreneurs });
   } catch (error) {
     res.status(500).json({ message: "Error fetching entrepreneurs", error });
+  }
+};
+
+export const getEntrepreneurDetail = async (req: Request, res: Response) => {
+  try {
+    const role = req.user?.role;
+    if (role !== "investor") {
+      return res
+        .status(401)
+        .json({ message: "You are not authorized to do it" });
+    }
+    const entrepreneur_id = req.params.entrepreneur_id;
+
+    const entrepreneur = await User.findOne({
+      _id: entrepreneur_id,
+      role: "entrepreneur",
+    }).select("-password");
+
+    if (!entrepreneur) {
+      return res.status(404).json({
+        success: false,
+        message: "Entrepreneur not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Entrepreneur detail fetched successfully",
+      data: entrepreneur,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching entrepreneur detail",
+    });
   }
 };
