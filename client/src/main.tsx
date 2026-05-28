@@ -29,6 +29,7 @@ import Chat from "./pages/chat/Chat.tsx";
 import ProtectedLayout from "./components/shared/layout/ProtectedLayout.tsx";
 import ContactPage from "./pages/contact/Contact.tsx";
 import About from "./pages/About/About.tsx";
+import EntrepreneurDetail from "./components/Investor/EntrepreneurDetailPage.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -44,6 +45,10 @@ const router = createBrowserRouter(
         <Route path="/dashboard/investor" element={<DashboardLayout />}>
           <Route index element={<InvestorDashboard />} />
           <Route path="entrepreneurs" element={<ViewEntrepreneurs />} />
+          <Route
+            path="entrepreneurs/:entrepreneur_id"
+            element={<EntrepreneurDetail />}
+          />
           <Route path="requests" element={<Requests />} />
           <Route path="profile" element={<Profile />} />
         </Route>

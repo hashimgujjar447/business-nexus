@@ -21,6 +21,23 @@ export const isAuthenticated = (
   next: NextFunction,
 ) => {
   try {
+    // ========================================
+    // Check Refresh Token Cookie First
+    // ========================================
+
+    const refreshToken = req.cookies?.refresh;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Session expired. Please login again.",
+      });
+    }
+
+    // ========================================
+    // Check Access Token
+    // ========================================
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
@@ -31,6 +48,10 @@ export const isAuthenticated = (
     }
 
     const accessToken = authHeader.split(" ")[1];
+
+    // ========================================
+    // Verify Access Token
+    // ========================================
 
     const decoded = jwt.verify(
       accessToken,

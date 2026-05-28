@@ -30,10 +30,6 @@ const MessageBox: React.FC<IMSGBOX> = ({ selectedUser }) => {
   const bottomRef = useRef<HTMLDivElement | null>(null); // 👈 auto scroll ref
 
   useEffect(() => {
-    if (!socket.connected) {
-      socket.connect();
-    }
-
     if (currentUser?._id && !hasJoinedRoom.current) {
       socket.emit("join-room", currentUser._id);
       hasJoinedRoom.current = true;

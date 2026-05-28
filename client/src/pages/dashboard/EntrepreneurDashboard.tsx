@@ -18,13 +18,9 @@ const EntrepreneurDashboard = () => {
       try {
         const acceptedRes = await getAcceptedRequests();
         const receivedRes = await getReceivedRequests();
-        console.log(
-          acceptedRes.data.requests || [],
-          receivedRes.data.requests || [],
-        );
 
-        setAcceptedRequests(acceptedRes.data.requests || []);
-        setReceivedRequests(receivedRes.data.requests || []);
+        setAcceptedRequests(acceptedRes.data.data || []);
+        setReceivedRequests(receivedRes.data.data || []);
       } catch (err) {
         console.error("Error fetching requests:", err);
       }

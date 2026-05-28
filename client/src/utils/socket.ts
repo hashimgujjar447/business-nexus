@@ -1,7 +1,7 @@
 // utils/socket.ts
 import { io } from "socket.io-client";
 
-const socket = io("https://business-nexus-backend-ddf511e82d76.herokuapp.com", {
+const socket = io("http://localhost:8080", {
   autoConnect: false,
 });
 

@@ -2,8 +2,8 @@
 import axiosInstance from "./axiosInstance";
 
 // Send collaboration request
-export const sendRequest = (receiverId: string) => {
-  return axiosInstance.post(`/request/send/${receiverId}`);
+export const sendRequest = (receiverId: string, data: { message: string }) => {
+  return axiosInstance.post(`/request/send/${receiverId}`, data);
 };
 
 // Update request status (accept/reject)

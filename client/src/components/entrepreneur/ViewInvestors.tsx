@@ -23,8 +23,9 @@ const ViewInvestors = () => {
     const fetchInvestors = async () => {
       try {
         const response = await getAcceptedRequests();
+        console.log(response);
 
-        const filteredRequests = response.data.requests.filter(
+        const filteredRequests = response.data.data.filter(
           (req: any) => req.receiverId._id === user?._id,
         );
 
