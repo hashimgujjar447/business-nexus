@@ -28,7 +28,7 @@ const ViewInvestors = () => {
         const filteredRequests = response.data.data.filter(
           (req: any) => req.receiverId._id === user?._id,
         );
-
+        console;
         const uniqueInvestors = Array.from(
           new Map(
             filteredRequests.map((req: any) => [req.senderId._id, req]),
