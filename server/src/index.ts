@@ -12,7 +12,7 @@ const onlineUsers = new Map<string, string>();
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: process.env.HOSTED_CLIENT_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
