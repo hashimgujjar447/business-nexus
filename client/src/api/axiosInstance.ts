@@ -5,7 +5,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: "https://business-nexus-backend-ddf511e82d76.herokuapp.com/api/v1",
 
   withCredentials: true,
 });
@@ -40,7 +40,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          "http://localhost:8080/api/v1/auth/refresh",
+          "https://business-nexus-backend-ddf511e82d76.herokuapp.com/api/v1/auth/refresh",
           {},
           {
             withCredentials: true,
