@@ -93,7 +93,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const payload = {
-      _id: user._id.toString(),
+      _id: (user._id as any).toString(),
       email: user.email,
       role: user.role,
     };
@@ -207,7 +207,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     }
 
     const payload = {
-      _id: user._id.toString(),
+      _id: (user._id as any).toString(),
       email: user.email,
       role: user.role,
     };

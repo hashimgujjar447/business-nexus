@@ -250,7 +250,7 @@ POST   /api/v1/auth/register
 POST   /api/v1/auth/login
 POST   /api/v1/auth/logout
 GET    /api/v1/auth/me
-POST   /api/v1/auth/refresh-access
+POST   /api/v1/auth/refresh
 ```
 
 ---
